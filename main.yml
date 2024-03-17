@@ -1,33 +1,33 @@
 ---
-- hosts: "docker_setup"
-  become: yes
+- hosts: "myhosts"
+  become: true
   vars:
     ansible_ssh_private_key_file: "/Users/alfvar/.ssh/id_rsa"
 
   name: Installing Docker
   tasks:
     - name: Check if Docker is installed
-      become: yes
+      become: true
       command: docker -v 
       register: docker_installed
       ignore_errors: true
    
     - name: Install Docker 
-      become: yes
+      become: true
       block:
         - name: Add Docker's official GPG key
           block:
             - name: Update apt
               include_tasks: apt.yml
             - name: Install necessary packages
-              become: yes
+              become: true
               ansible.builtin.apt:
                 name:
                   - ca-certificates 
                   - curl
                   - gnupg
                 state: latest
-                update_cache: yes
+                update_cache: true
             - name: Add GPG key
               ansible.builtin.shell:
                 cmd: |
@@ -47,7 +47,7 @@
               include_tasks: apt.yml
 
         - name: Install Docker packages
-          become: yes
+          become: true
           ansible.builtin.apt:
             name:
               - docker-ce 
@@ -56,11 +56,11 @@
               - docker-buildx-plugin 
               - docker-compose-plugin
             state: latest
-            update_cache: yes
+            update_cache: true
       when: docker_installed.failed
 
     - name: Ensure Docker group exists
-      become: yes
+      become: true
       ansible.builtin.group:
         name: docker
         state: present

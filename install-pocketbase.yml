@@ -1,0 +1,19 @@
+- name: Deploy a pocketbase container
+  hosts: localhost
+  tasks:
+    - name: Deploy a pocketbase container
+      docker_container:
+        name: pocketbase
+        image: pocketbase
+        state: started
+        ports:
+          - "8080:8080"
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /usr/bin/docker:/usr/bin/docker
+          - /usr/lib/x86_64-linux-gnu/libltdl.so.7:/usr/lib/x86_64-linux-gnu/libltdl.so.7
+        restart_policy: always
+        privileged: yes
+        env:
+          - POCKETBASE_PORT=8080
+          - POCKETBASE_HOST=

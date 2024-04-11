@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  borg-server:
+    image: horaceworblehat/borg-server
+    environment:
+      - BORG_AUTHORIZED_KEYS=<ssh_authorized_key>
+    volumes:
+      - borg:/var/backups/borg
+
+volumes:
+  borg:
+

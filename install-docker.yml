@@ -1,4 +1,4 @@
-- hosts: nanode_1
+- hosts: myhosts
   roles:
     - role: geerlingguy.docker
       vars:
@@ -8,5 +8,6 @@
         docker_service_enabled: true
         docker_restart_handler_state: restarted
         docker_add_repo: true
+      become: true
     - role: geerlingguy.pip
         

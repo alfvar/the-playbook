@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  minecraft:
+    image: phyremaster/papermc
+    ports:
+      - "25565:25565"
+      - "8080:8080"
+      - "19132:19132/udp"
+      - "25575:25575"
+    volumes:
+      - minecraft-data:/papermc
+    environment:
+      - EULA=true
+      - MC_RAM=14G
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+volumes:
+  minecraft-data:

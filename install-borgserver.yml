@@ -5,29 +5,81 @@
     group: backup
     home: /home/backup
     pool: "{{ home }}/repos"
-  tasks:
-  - package: name=borgbackup state=present #install borgbackup
-  - group: name="{{ group }}" state=present #create group
-  - user: name="{{ user }}" shell=/bin/bash home="{{ home }}" createhome=yes group="{{ group }}" groups= state=present #create user
-  - file: path="{{ home }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create home directory
-  - file: path="{{ home }}/.ssh" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create .ssh directory
-  - file: path="{{ pool }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create repos directory
 
-  - name: Add authorized keys
-    authorized_key: 
-      user: "{{ user }}"
-      key: "{{ lookup('file', item) }}"
-      key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict'
-    with_fileglob: 
-      - "keys/*.pub"
-  - file: path="{{ home }}/.ssh/authorized_keys" owner="{{ user }}" group="{{ group }}" mode=0600 state=file
-  
-  - name: Create directories for each user
-    file: 
-      path: "{{ pool }}/{{ item | basename | splitext | first }}"
-      owner: "{{ user }}"
-      group: "{{ group }}"
-      mode: 0700
-      state: directory
-    with_fileglob: 
-      - "keys/*.pub"
+  tasks:
+    - name: Install the Borgbackup package
+      package:
+        name: borgbackup
+        state: present
+
+    - name: Create the backup usergroup
+      group:
+        name: "{{ group }}"
+        state: present
+
+    - name: Create backup user's home directory
+      user:
+        name: "{{ user }}"
+        shell: /bin/bash
+        home: "{{ home }}"
+        createhome: yes
+        group: "{{ group }}"
+        groups:
+        state: present
+
+    - name: Create home directory
+      file:
+        path: "{{ home }}"
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: 0700
+        state: directory
+
+    - name: Create .ssh directory for backup user
+      file:
+        path: "{{ home }}/.ssh"
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: 0700
+        state: directory # Create .ssh directory with restricted permissions for SSH keys
+
+    - name: Create repository directory
+      file:
+        path: "{{ pool }}"
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: 0700
+        state: directory # Create repository directory with restricted permissions for storing backups
+
+    - name: Add authorized keys for backup user
+      authorized_key:
+        user: "{{ user }}"
+        key: "{{ lookup('file', item) }}"
+        key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict'
+      with_fileglob: # Iterate over contents of the keys directory
+        - "keys/*.pub" # Add public keys to authorized_keys file with Borg-specific permissions
+
+    - name: Set permissions for authorized_keys file
+      file:
+        path: "{{ home }}/.ssh/authorized_keys"
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: 0600
+        state: file
+
+    - name: Create directories for each user
+      file:
+        path: "{{ pool }}/{{ item | basename | splitext | first }}"
+        owner: "{{ user }}"
+        group: "{{ group }}"
+        mode: 0700
+        state: directory
+      with_fileglob:
+        - "keys/*.pub" # So, for each .pub file in the keys directory, a corresponding directory is created within /repos.
+
+    - name: Initialize a corresponding Borg repository on each client
+      command: 
+        cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:/"
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['myhosts'] }}"
+      when: hostvars[item].backup_volume | length > 0

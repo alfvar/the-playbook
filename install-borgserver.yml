@@ -1,23 +1,31 @@
-- hosts: blade
+---
+- hosts: nanode_1
   vars:
     user: backup
     group: backup
     home: /home/backup
     pool: "{{ home }}/repos"
-    auth_users:
-      - host: alfvars-mac.local
-        key: "{{ lookup('file', '/path/to/keys/johndoe.clnt.local.pub') }}"
   tasks:
-  - package: name=borg state=present
+  - package: name=borgbackup state=present
   - group: name="{{ group }}" state=present
   - user: name="{{ user }}" shell=/bin/bash home="{{ home }}" createhome=yes group="{{ group }}" groups= state=present
   - file: path="{{ home }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
   - file: path="{{ home }}/.ssh" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
   - file: path="{{ pool }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
-  - authorized_key: user="{{ user }}"
-                    key="{{ item.key }}"
-                    key_options='command="cd {{ pool }}/{{ item.host }};borg serve --restrict-to-path {{ pool }}/{{ item.host }}",restrict'
-    with_items: "{{ auth_users }}"
+  - name: Add authorized keys
+    authorized_key: 
+      user: "{{ user }}"
+      key: "{{ lookup('file', item) }}"
+      key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict'
+    with_fileglob: 
+      - "pubkeys/*.pub"
   - file: path="{{ home }}/.ssh/authorized_keys" owner="{{ user }}" group="{{ group }}" mode=0600 state=file
-  - file: path="{{ pool }}/{{ item.host }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
-    with_items: "{{ auth_users }}"
+  - name: Create directories for each user
+    file: 
+      path: "{{ pool }}/{{ item | basename | splitext | first }}"
+      owner: "{{ user }}"
+      group: "{{ group }}"
+      mode: 0700
+      state: directory
+    with_fileglob: 
+      - "pubkeys/*.pub"

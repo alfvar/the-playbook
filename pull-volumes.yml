@@ -1,0 +1,14 @@
+---
+- name: Copy Docker named volumes to local machine
+  hosts: all
+  tasks:
+    - name: Get the list of Docker volumes
+      command: docker volume ls --format "{{ '{{.Name}}' }}"
+      register: docker_volumes
+      changed_when: false
+
+    - name: Copy each Docker volume to local machine
+      synchronize:
+        src: "/var/lib/docker/volumes/{{ item }}/ _data/"
+        dest: "volumes/{{ item }}/"
+      loop: "{{ docker_volumes.stdout_lines }}"

@@ -1,0 +1,5 @@
+# Ignore all .pub files in the pubkeys directory
+pubkeys/*.pub
+
+# Ignore the inventory file in the root directory
+inventory.yml

@@ -13,4 +13,4 @@ Used to back up the Docker volumes to a central Docker server. Installs `borgbac
 Should be the machine with the beefiest storage. Copies the keys from the `/pubkeys` directory and also sets up a user per .pub file.
 
 ### Pocketbase, Minecraft Server
-Depends on Docker. 
+Copies the relevant file from `compose/filename.yml` file to the target and runs it using Docker Compose.

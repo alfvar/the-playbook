@@ -1,5 +1,5 @@
 # Ignore all .pub files in the pubkeys directory
 pubkeys/*.pub
-
+.DS_Store
 # Ignore the inventory file in the root directory
 inventory.yml

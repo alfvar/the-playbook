@@ -6,20 +6,22 @@
     home: /home/backup
     pool: "{{ home }}/repos"
   tasks:
-  - package: name=borgbackup state=present
-  - group: name="{{ group }}" state=present
-  - user: name="{{ user }}" shell=/bin/bash home="{{ home }}" createhome=yes group="{{ group }}" groups= state=present
-  - file: path="{{ home }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
-  - file: path="{{ home }}/.ssh" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
-  - file: path="{{ pool }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory
+  - package: name=borgbackup state=present #install borgbackup
+  - group: name="{{ group }}" state=present #create group
+  - user: name="{{ user }}" shell=/bin/bash home="{{ home }}" createhome=yes group="{{ group }}" groups= state=present #create user
+  - file: path="{{ home }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create home directory
+  - file: path="{{ home }}/.ssh" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create .ssh directory
+  - file: path="{{ pool }}" owner="{{ user }}" group="{{ group }}" mode=0700 state=directory #create repos directory
+
   - name: Add authorized keys
     authorized_key: 
       user: "{{ user }}"
       key: "{{ lookup('file', item) }}"
       key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict'
     with_fileglob: 
-      - "pubkeys/*.pub"
+      - "keys/*.pub"
   - file: path="{{ home }}/.ssh/authorized_keys" owner="{{ user }}" group="{{ group }}" mode=0600 state=file
+  
   - name: Create directories for each user
     file: 
       path: "{{ pool }}/{{ item | basename | splitext | first }}"
@@ -28,4 +30,4 @@
       mode: 0700
       state: directory
     with_fileglob: 
-      - "pubkeys/*.pub"
+      - "keys/*.pub"

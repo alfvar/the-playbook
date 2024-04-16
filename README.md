@@ -10,7 +10,7 @@ Turns my lost and found old machines into usable parts of my homelab. Tested wit
 Used to back up the Docker volumes to a central Docker server. Installs `borgbackup` on the remote host, then generates ssh keys locally and copies the private keys to the remote.
 
 ### Borgserver
-Should be the machine with the beefiest storage. Installs `borgbackup` on the remote host, then`copies the .pub files from the `/keys` directory and also sets up a Borgbackup user for each .pub file. If new hosts with the property `backup_volume`are added, this script should be run again.
+Should be the machine with the beefiest storage. Installs `borgbackup` on the remote host, then copies the .pub files from the `/keys` directory and also sets up a Borgbackup user for each .pub file. If new hosts with the property `backup_volume`are added, this script should be run again.
 
 ### Pocketbase, Minecraft Server
 Copies the relevant file from `compose/filename.yml` file to the target and runs it using Docker Compose.

@@ -1,0 +1,10 @@
+---
+- hosts: blade
+  gather_facts: no
+  tasks:
+    - name: Initialize a corresponding Borg repository on each client
+      command:
+        cmd: "borg init --encryption=none backup@{{ hostvars['nanode_1'].ansible_host }}:/"
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['myhosts'] }}"
+      when: backup_volume is defined and backup_volume != ''

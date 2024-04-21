@@ -1,5 +1,7 @@
 ---
 - hosts: nanode_1
+  become: true
+
   vars:
     user: backup
     group: backup
@@ -55,7 +57,7 @@
       authorized_key:
         user: "{{ user }}"
         key: "{{ lookup('file', item) }}"
-        key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict'
+        key_options: 'command="cd {{ pool }}/{{ item | basename | splitext | first }};borg serve --restrict-to-path {{ pool }}/{{ item | basename | splitext | first }}",restrict' #restrict each ssh key to only access its appropriate storage pool
       with_fileglob: # Iterate over contents of the keys directory
         - "keys/*.pub" # Add public keys to authorized_keys file with Borg-specific permissions
 
@@ -75,11 +77,4 @@
         mode: 0700
         state: directory
       with_fileglob:
-        - "keys/*.pub" # So, for each .pub file in the keys directory, a corresponding directory is created within /repos.
-
-    - name: Initialize a corresponding Borg repository on each client
-      command: 
-        cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:/"
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['myhosts'] }}"
-      when: hostvars[item].backup_volume | length > 0
+        - "keys/*.pub" # For each .pub file in the keys directory, a corresponding directory is created within /repos.

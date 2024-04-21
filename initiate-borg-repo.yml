@@ -1,5 +1,5 @@
 ---
-- hosts: all #blade needs to be identified with a variable eventually
+- hosts: all 
   gather_facts: no
   tasks:
   - block:

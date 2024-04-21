@@ -35,7 +35,7 @@ myhosts:
 Used to back up the Docker volumes to a centralized backup server. Installs `borgbackup` on the remote host, then generates ssh keys locally and copies their private keys to the remote. The ssh keys are labeled after the name of the backup_volume variable defined in `inventory.yml`
 
 ### Borgserver
-Should run after the appropriate ssh keys exist in the `keys` folder. Installs `borgbackup` on the specified remote host, then copies the contents of the .pub files from the `/keys` directory into `authorized_keys` and also sets up a Borgbackup user for each .pub file. Each client for the Borgserver should then run the the `borg init` command. 
+Should run after the clients have been set up. Installs `borgbackup` on the specified remote host, then copies the contents of the .pub files from the `/keys` directory into `authorized_keys` and also sets up a Borgbackup user for each .pub file. Each client for the Borgserver should then run the the `borg init` command. 
 
 ### Pocketbase, Minecraft Server
 Copies the relevant file from `compose/filename.yml` file to the target and runs it using Docker Compose.

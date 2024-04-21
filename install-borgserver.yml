@@ -1,5 +1,5 @@
 ---
-- hosts: backupserver
+- hosts: backup_server
   become: true
 
   vars:

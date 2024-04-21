@@ -14,20 +14,18 @@ myhosts:
     blade:
       ansible_host: example.com
       ansible_user: alfvar
-      backup_volume: "minecraft_data"
-      tags:
-        - minecraft
+      backup_volume: "minecraft_data" # So Borg knows what things to back up
 
     raspberrypi:
       ansible_host: east.example.com
       ansible_user: alfvar
       backup_volume: "pocketbase_data"      
-      tags:
-        - pocketbase
         
     nanode_1:
       ansible_host: 127.0.0.1
       ansible_user: root
+      tags:
+      - backup_server # So we can target the machine acting as the backup server
 ```
 
 

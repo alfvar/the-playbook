@@ -8,13 +8,13 @@
         name: borgbackup
         state: latest
 
-    - name: Check if SSH keypair already exists
+    - name: Check if SSH keypair already exists in the local /keys directory
       ansible.builtin.stat: # Read filename properties
-        path: "keys/{{ backup_volume }}" # Find files where the filename matches the remote machine's backup volume label
+        path: "keys/{{ backup_volume }}" # Find files in /keys where the filename matches the volume_backup label given in inventory.yml
       delegate_to: localhost # Run on the local machine
       register: keypair # Store in a variable
 
-    - name: Generate SSH keypair for {{ backup_volume }}
+    - name: Generate SSH keypair for each backup_volume defined in inventory.yml
       community.crypto.openssh_keypair:
         type: rsa
         path: "keys/{{ backup_volume }}"
@@ -25,7 +25,7 @@
       ansible.builtin.copy:
         src: "keys/{{ backup_volume }}"
         dest: "/home/{{ ansible_user }}/.ssh/id_rsa" # And rename them to their default name
-      delegate_to: "{{ inventory_hostname }}" 
+      delegate_to: "{{ inventory_hostname }}" # Run on the remote machine
 
     - name: Set restrictive permissions on private key
       ansible.builtin.file:

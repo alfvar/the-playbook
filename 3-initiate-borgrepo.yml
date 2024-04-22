@@ -1,11 +1,25 @@
 ---
-- hosts: all 
+- hosts: all
   gather_facts: no
   tasks:
-  - block:
-    - name: Initialize a corresponding Borg repository on each client
-      command:
-        cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:/{{ backup_volume }}"
-      delegate_to: "{{ item }}"
-      with_items: "{{ groups['backup_server'] }}"
-  when: backup_volume is defined and backup_volume != ''
+    - block:
+        - name: Add hosts to known hosts file
+          known_hosts:
+            name: "{{ hostvars[item].ansible_host }}"
+            key: "{{ lookup('pipe', 'ssh-keyscan ' + hostvars[item].ansible_host) }}"
+          when: hostvars[item].backup_volume is defined and hostvars[item].backup_volume != ''
+            
+          with_items: "{{ groups['backup_server'] }}"
+
+        - name: Print the command that will be run
+          debug:
+            msg: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:{{ hostvars[item].backup_volume }}"
+          when: hostvars[item].backup_volume is defined and hostvars[item].backup_volume != ''
+          with_items: "{{ groups['backup_server'] }}"
+
+        - name: Initialize a corresponding Borg repository on each client
+          command:
+            cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:{{ hostvars[item].backup_volume }}"
+          delegate_to: "{{ item }}"
+          when: hostvars[item].backup_volume is defined and hostvars[item].backup_volume != ''
+          with_items: "{{ groups['backup_server'] }}"

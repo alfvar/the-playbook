@@ -5,7 +5,7 @@
   - block:
     - name: Initialize a corresponding Borg repository on each client
       command:
-        cmd: "borg init --encryption=none backup@{{ hostvars['nanode_1'].ansible_host }}:/{{ backup_volume }}"
+        cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:/{{ backup_volume }}"
       delegate_to: "{{ item }}"
-      with_items: "{{ groups['myhosts'] }}"
+      with_items: "{{ groups['backup_server'] }}"
   when: backup_volume is defined and backup_volume != ''

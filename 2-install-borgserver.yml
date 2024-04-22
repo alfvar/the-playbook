@@ -19,7 +19,7 @@
         name: "{{ group }}"
         state: present
 
-    - name: Create backup user's home directory
+    - name: Create backup user's home directory # The borg clients expect a certain filestructure
       user:
         name: "{{ user }}"
         shell: /bin/bash
@@ -71,10 +71,8 @@
 
     - name: Create directories for each user
       file:
-        path: "{{ pool }}/{{ item | basename | splitext | first }}"
+        path: "{{ pool }}/data" # backup/key_name as directory name
         owner: "{{ user }}"
         group: "{{ group }}"
         mode: 0700
         state: directory
-      with_fileglob:
-        - "keys/*.pub" # For each .pub file in the keys directory, a corresponding directory is created within /repos.

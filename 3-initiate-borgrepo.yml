@@ -13,13 +13,16 @@
 
         - name: Print the command that will be run
           debug:
-            msg: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:{{ hostvars[item].backup_volume }}"
-          when: hostvars[item].backup_volume is defined and hostvars[item].backup_volume != ''
-          with_items: "{{ groups['backup_server'] }}"
+            msg: "borg init --encryption=none backup@{{ hostvars[backup_server].ansible_host }}:{{ hostvars[inventory_hostname].backup_volume }}"
+          when: hostvars[inventory_hostname].backup_volume is defined and hostvars[inventory_hostname].backup_volume != ''
+          loop: "{{ groups['backup_server'] }}"
+          loop_control:
+            loop_var: backup_server
 
         - name: Initialize a corresponding Borg repository on each client
           command:
-            cmd: "borg init --encryption=none backup@{{ hostvars[item].ansible_host }}:{{ hostvars[item].backup_volume }}"
-          delegate_to: "{{ item }}"
-          when: hostvars[item].backup_volume is defined and hostvars[item].backup_volume != ''
-          with_items: "{{ groups['backup_server'] }}"
+            cmd: "borg init --encryption=none backup@{{ hostvars[backup_server].ansible_host }}:{{ hostvars[inventory_hostname].backup_volume }}"
+          when: hostvars[inventory_hostname].backup_volume is defined and hostvars[inventory_hostname].backup_volume != ''
+          loop: "{{ groups['backup_server'] }}" # Loop through all backup servers
+          loop_control:
+            loop_var: backup_server

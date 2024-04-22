@@ -25,6 +25,14 @@
       ansible.builtin.copy:
         src: "keys/{{ backup_volume }}"
         dest: "/home/{{ ansible_user }}/.ssh/id_rsa" # And rename them to their default name
+        backup: yes
+      delegate_to: "{{ inventory_hostname }}" # Run on the remote machine
+
+    - name: Copy public key to appropriate remote machine
+      ansible.builtin.copy:
+        src: "keys/{{ backup_volume }}.pub"
+        dest: "/home/{{ ansible_user }}/.ssh/id_rsa.pub" # And rename them to their default name
+        backup: yes
       delegate_to: "{{ inventory_hostname }}" # Run on the remote machine
 
     - name: Set restrictive permissions on private key

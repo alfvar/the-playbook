@@ -1,0 +1,36 @@
+---
+- hosts: all
+  tasks:
+  - block:
+    - name: Borg client is installed
+      become: true
+      ansible.builtin.package:
+        name: borgbackup
+        state: latest
+
+    - name: Check if SSH keypair already exists
+      ansible.builtin.stat: # Read filename properties
+        path: "keys/{{ backup_volume }}" # Find files where the filename matches the remote machine's backup volume label
+      delegate_to: localhost # Run on the local machine
+      register: keypair # Store in a variable
+
+    - name: Generate SSH keypair for {{ backup_volume }}
+      community.crypto.openssh_keypair:
+        type: rsa
+        path: "keys/{{ backup_volume }}"
+      delegate_to: localhost # Run on the local machine
+      when: not keypair.stat.exists # Only generate a new keypair if one doesn't already exist
+
+    - name: Copy private key to appropriate remote machine
+      ansible.builtin.copy:
+        src: "keys/{{ backup_volume }}"
+        dest: "/home/{{ ansible_user }}/.ssh/id_rsa" # And rename them to their default name
+      delegate_to: "{{ inventory_hostname }}" 
+
+    - name: Set restrictive permissions on private key
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.ssh/id_rsa"
+        mode: '0600'
+      delegate_to: "{{ inventory_hostname }}"
+
+    when: backup_volume is defined and backup_volume != '' # Only run on machines with a backup volume defined

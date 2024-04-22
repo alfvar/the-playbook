@@ -32,7 +32,6 @@ myhosts:
       hosts:
         blade:
         nanode_1:
-
 ```
 
 
@@ -45,5 +44,8 @@ Should run after the clients have been set up. Installs `borgbackup` on each hos
 ### 3-initiate-borgrepo.yml
 Should be run after the servers have been set up. Makes sure that all clients know the Borgserver hosts and runs `borg init --encryption=none backup@[Name of Borgserver]` on each Borgclient, allowing them to talk to eachother.
 
-### Pocketbase, Minecraft Server
-Copies the relevant file from `compose/filename.yml` file to the target and runs it using Docker Compose.
+### Creating backups
+A manual backup is created via `borg create backup@[ansible_host_that_is_a_borg_server]:[backup_volume]::[label] [path_to_file_on_local_system]` on any host that is a Borg client. It is restricted to only make backups to the particular subfolder on the server that houses that client's `backup_volume`.
+
+### Restoring backups
+Follow the [offical manual](https://borgbackup.readthedocs.io/en/stable/index.html) for Borg. For the volumes that do not contain sensitive data, I've chosen to not encrypt the backups, which for now can be edited in `3-initiate-borg-repo.yml`. This is so that I can get access to them should I lose the system they reside on.

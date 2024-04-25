@@ -12,19 +12,28 @@
         group: "{{ ansible_user }}"
         mode: '0755'
 
+    - name: Ensure log directory exists
+      file:
+        path: "/home/{{ ansible_user }}/minecraft/logs"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+        
+
     - name: Remove all borg create commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg create.*"
         state: absent
 
-    - name: Insert new borg create commands in minecraft_backup.sh
+    - name: Insert new borg create commands in minecraft_backup.sh # to backup to all backup servers
       blockinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         block: |
           {% for item in groups['backup_server'] %}
-          # borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${local_backup_dir}"
+          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
           {% endfor %}
-        marker: "# {mark} GENERATED BLOCK"
+        marker: "# {mark}"
         create: yes
-
+        insertafter: '# DYNAMICALLY GENERATED'

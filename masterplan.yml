@@ -1,0 +1,7 @@
+# Runs all the playbooks in order
+- import_playbook: 1_install_borgclient.yml
+- import_playbook: 2_install_borgserver.yml
+- import_playbook: 3_initiate_borgrepo.yml
+
+- import_playbook: minecraft/install_minecraft_server.yml
+- import_playbook: minecraft/setup_backup_cron.yml

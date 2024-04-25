@@ -2,7 +2,7 @@
 
 ### Portforwards required:
 
-* 25565:25565 for Java clients
+* 25565:25565/tcp-udp for Java clients
 * 19132:19132/udp for Bedrock clients 
 
 Portforwarding reminder: External hosts allowed should be set to * unless you only want specific ip adresses to connect. Internal host should be the ip adress of the machine running the server. 

@@ -46,3 +46,10 @@
         marker: "# {mark}"
         create: yes
         insertafter: '# DYNAMICALLY GENERATED' # This is how we know where to insert the borg commands. Needs to be present in the minecraft_backup.sh file
+
+    - name: Set up cron job to run minecraft_backup.sh every 15 minutes
+      ansible.builtin.cron:
+        name: "Run minecraft_backup.sh every 15 minutes"
+        user: "{{ ansible_user }}"
+        minute: "*/15"
+        job: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"

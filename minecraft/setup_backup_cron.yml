@@ -4,6 +4,15 @@
     backup_volume: "{{ hostvars[inventory_hostname]['backup_volume'] }}"
 
   tasks:
+    - name: Check if minecraft directory exists
+      ansible.builtin.stat:
+        path: "/home/{{ ansible_user }}/minecraft"
+      register: mcdir_check
+
+    - name: Install the minecraft server if it doesn't exist
+      include_tasks: install_minecraft_server.yml
+      when: not mcdir_check.stat.exists
+  
     - name: Copy minecraft_backup.sh to remote
       copy:
         src: minecraft_backup.sh
@@ -32,8 +41,8 @@
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         block: |
           {% for item in groups['backup_server'] %}
-          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
+          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list --stats >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
           {% endfor %}
         marker: "# {mark}"
         create: yes
-        insertafter: '# DYNAMICALLY GENERATED'
+        insertafter: '# DYNAMICALLY GENERATED' # This is how we know where to insert the borg commands. Needs to be present in the minecraft_backup.sh file

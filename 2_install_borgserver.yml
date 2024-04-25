@@ -45,6 +45,11 @@
         mode: 0700
         state: directory # Create .ssh directory with restricted permissions for SSH keys
 
+    - name: Create 2GB reserve file in .ssh directory
+      command: 
+        cmd: dd if=/dev/zero of="{{ home }}/reserve" bs=1G count=2
+        creates: "{{ home }}/reserve"
+
     - name: Create repository directory
       file:
         path: "{{ pool }}"

@@ -1,0 +1,25 @@
+---
+- name: Rcon
+  hosts: minecraft_server
+  become: true
+  tasks:
+    - name: Install rcon
+      package:
+        name: rcon
+        state: present
+
+    - name: Get Minecraft container IP #define the name of your compose.yml here
+      command: docker inspect --format={{ "'{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'" }} minecraft
+      register: minecraft_ip
+
+    - name: Create rcon.conf #Replace port and passwd with your own values
+      ansible.builtin.copy:
+        dest: /etc/rcon.conf
+        content: |
+          [minecraft]
+          host = {{ minecraft_ip.stdout }}
+          port = 25575
+          passwd = 4321
+        owner: root
+        group: root
+        mode: '0644'

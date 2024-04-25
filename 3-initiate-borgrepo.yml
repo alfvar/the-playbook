@@ -3,7 +3,7 @@
   gather_facts: no
   tasks:
     - block:
-        - name: Add hosts to known hosts file
+        - name: Add hosts of backup_server into known hosts file
           known_hosts:
             name: "{{ hostvars[item].ansible_host }}"
             key: "{{ lookup('pipe', 'ssh-keyscan ' + hostvars[item].ansible_host) }}"

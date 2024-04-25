@@ -7,7 +7,7 @@ services:
     ports:
       - "25565:25565"
       - "25575:25575"
-      - "8080:8080"
+#     - "8080:8080" # Uncomment this line to enable plugins with web front-ends such as Dynmap
       - "19132:19132/udp"
     volumes:
       - data:/papermc

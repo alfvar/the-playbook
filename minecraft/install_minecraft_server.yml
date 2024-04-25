@@ -3,6 +3,10 @@
   hosts: minecraft_server
   become: true
   tasks:
+    - name: Set timezone to Stockholm # Change to your own timezone
+      ansible.builtin.timezone:
+        name: "Europe/Stockholm"
+
     - name: Check if Docker is installed
       command: docker --version
       ignore_errors: true
@@ -30,7 +34,7 @@
     - name: Install rcon if not installed
       include_tasks: install-rcon.yml
       when: rcon_check.rc != 0
-  
+
     - name: Run docker-compose
       command: docker compose up -d --remove-orphans
       args:

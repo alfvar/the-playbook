@@ -1,22 +1,25 @@
 #!/bin/bash
 
+timestamp=$(date +%Y%m%d%H%M) # Define the timestamp variable
+mcserver_backup_dir=/tmp/minecraft/mc_${timestamp} # Temporary backup directory on the minecraft server machine
+
 # Save the Minecraft world
-rconclt minecraft "/save-off"
-rconclt minecraft "/save-all"
-rconclt minecraft "say Backup started. Saving the world..."
+rconclt minecraft "save-off"
+rconclt minecraft "save-all"
+rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Sparar världen...\"}"
+sleep 1
 
-# Wait for save to complete (adjust sleep time as needed)
-sleep 20
+# Wait until save is disabled
+until rconclt minecraft "save-off status" | grep -q "off"; do
+    sleep 1
+done
 
-# Backup the Minecraft world (replace /path/to/minecraft/world with the actual path)
-# borg create <remote_repository>::<archive_name> /path/to/minecraft/world
-timestamp=$(date +%Y%m%d%H%M%S)
-backup_dir=$HOME/minecraft/backup_${timestamp}
+rconclt minecraft "tellraw @a {\"text\":\"<Jesper> mc_${timestamp}\"}"
 
-mkdir -p ${backup_dir}
+rm -rf /tmp/minecraft/* # Remove all old backups
+mkdir -p ${mcserver_backup_dir} # Make the directory if it doesn't exist
+docker cp minecraft:/papermc ${mcserver_backup_dir} # Copy the world data to the backup directory
 
-docker cp minecraft:/papermc ${backup_dir}
-# Turn saving back on
-rconclt minecraft "save-on"
+rconclt minecraft "save-on" # Turn saving back on
 
-borg create backup@<all hosts part of backup_server group>:minecraft_data::<timestamp> <path_to_file_on_local_system>
+# The rest is dynamically generated, and will be inserted into the end of the file when copied to the server

@@ -1,0 +1,30 @@
+- hosts: minecraft_server
+  become: true
+  vars:
+    backup_volume: "{{ hostvars[inventory_hostname]['backup_volume'] }}"
+
+  tasks:
+    - name: Copy minecraft_backup.sh to remote
+      copy:
+        src: minecraft_backup.sh
+        dest: /home/{{ ansible_user }}/minecraft/minecraft_backup.sh
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Remove all borg create commands from minecraft_backup.sh
+      lineinfile:
+        path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
+        regexp: ".*borg create.*"
+        state: absent
+
+    - name: Insert new borg create commands in minecraft_backup.sh
+      blockinfile:
+        path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
+        block: |
+          {% for item in groups['backup_server'] %}
+          # borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${local_backup_dir}"
+          {% endfor %}
+        marker: "# {mark} GENERATED BLOCK"
+        create: yes
+

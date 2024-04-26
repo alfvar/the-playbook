@@ -18,7 +18,7 @@ myhosts:
         
     nanode_1: # This machine is a backup server, see backup_server section further down
       ansible_host: 127.0.0.1
-      ansible_user: root
+      ansible_user: alfvar # The ssh config won't work with root as the user
 
     blade: # This machine both has volumes it needs to backup and hosts a backup server
       ansible_host: example.com
@@ -26,12 +26,17 @@ myhosts:
       backup_volume: "minecraft_data" # So Borg knows what things to back up
 
   children:
-  # So Borg knows what machines should be backup servers.
-  # Multiple machines allowed and recommended for redundancy
-    backup_server:
+    backup_server: # Hosts here will have the Borg backup server installed. Multiple machines recommended
       hosts:
         blade:
+        # nanode_1:
+    backup_client: # Hosts here will have the Borg backup client installed
+      hosts:
+        blade: # The same machine can be both client and server!
         nanode_1:
+    minecraft_server: # Hosts here will have the Minecraft server installed. Multiple servers not supported at the moment
+      hosts:
+        blade:
 ```
 
 

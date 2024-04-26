@@ -45,7 +45,7 @@
         mode: 0700
         state: directory # Create .ssh directory with restricted permissions for SSH keys
 
-    - name: Create 2GB reserve file in .ssh directory
+    - name: Create 2GB reserve file
       command: 
         cmd: dd if=/dev/zero of="{{ home }}/reserve" bs=1G count=2
         creates: "{{ home }}/reserve"
@@ -57,6 +57,12 @@
         group: "{{ group }}"
         mode: 0700
         state: directory # Create repository directory with restricted permissions for storing backups
+
+    - name: Clear authorized_keys file
+      ansible.builtin.copy:
+        content: ""
+        dest: "/home/{{ user }}/.ssh/authorized_keys"
+        backup: yes
 
     - name: Add authorized keys for backup user
       authorized_key:

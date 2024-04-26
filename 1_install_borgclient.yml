@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: backup_client
   tasks:
   - block:
     - name: Borg client is installed
@@ -21,24 +21,27 @@
       delegate_to: localhost # Run on the local machine
       when: not keypair.stat.exists # Only generate a new keypair if one doesn't already exist
 
-    - name: Copy private key to appropriate remote machine
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/.ssh"
+        state: directory
+
+    - name: Copy private key to backup client
       ansible.builtin.copy:
         src: "keys/{{ backup_volume }}"
         dest: "/home/{{ ansible_user }}/.ssh/id_rsa" # And rename them to their default name
-        backup: yes
-      delegate_to: "{{ inventory_hostname }}" # Run on the remote machine
 
-    - name: Copy public key to appropriate remote machine
+    - name: Copy public key to backup client
       ansible.builtin.copy:
         src: "keys/{{ backup_volume }}.pub"
-        dest: "/home/{{ ansible_user }}/.ssh/id_rsa.pub" # And rename them to their default name
-        backup: yes
-      delegate_to: "{{ inventory_hostname }}" # Run on the remote machine
+        dest: "/home/{{ ansible_user }}/.ssh/id_rsa.pub"
+
+    - name: Check if id_rsa file is present
+      ansible.builtin.stat:
+        path: "/home/{{ ansible_user }}/.ssh/id_rsa"
+      register: result
 
     - name: Set restrictive permissions on private key
       ansible.builtin.file:
         path: "/home/{{ ansible_user }}/.ssh/id_rsa"
         mode: '0600'
-      delegate_to: "{{ inventory_hostname }}"
-
-    when: backup_volume is defined and backup_volume != '' # Only run on machines with a backup volume defined

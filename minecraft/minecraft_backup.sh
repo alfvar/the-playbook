@@ -20,11 +20,6 @@ docker cp minecraft:/papermc ${mcserver_backup_dir} # Copy the world data to the
 rconclt minecraft "save-on" # Turn saving back on
 
 #BORGCREATE
-create_exit=$?
-
-prune_exit=$?
-
-compact_exit=$?
 
 if [ $create_exit -eq 0 ]; then
     rconclt minecraft "tellraw nobody {\"text\":\"<Jesper> Kopian skickades till backupservrarna!\", \"color\":\"gray\"}"

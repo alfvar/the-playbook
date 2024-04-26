@@ -53,10 +53,12 @@
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         block: |
           {% for item in groups['backup_server'] %}
-          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list --stats >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
-          borg prune --glob-archives 'mc_*' --list --show-rc --keep-minutely 96 --keep-daily 28 --keep-weekly 16 --keep-monthly 12 backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
-          borg compact backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}.log 2>&1
-
+          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list --stats >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          create_exit=$?
+          borg prune --glob-archives 'mc_*' --list --show-rc --keep-minutely 96 --keep-daily 28 --keep-weekly 16 --keep-monthly 12 backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          prune_exit=$?
+          borg compact backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          compact_exit=$?
           {% endfor %}
         marker: "# {mark}"
         create: yes

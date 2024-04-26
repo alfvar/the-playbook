@@ -1,0 +1,72 @@
+- hosts: pocketbase_server
+  become: true
+  vars:
+    backup_volume: "{{ hostvars[inventory_hostname]['backup_volume'] }}"
+
+  tasks:
+    - name: Check if pocketbase directory exists
+      ansible.builtin.stat:
+        path: "/home/{{ ansible_user }}/pocketbase"
+      register: mcdir_check
+
+    - name: Install the pocketbase server if it doesn't exist
+      include_tasks: install_pocketbase_server.yml
+      when: not mcdir_check.stat.exists
+  
+    - name: Copy pocketbase_backup.sh to remote
+      copy:
+        src: pocketbase_backup.sh
+        dest: /home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Ensure log directory exists
+      file:
+        path: "/home/{{ ansible_user }}/pocketbase/logs"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+        
+
+    - name: Remove all borg create commands from pocketbase_backup.sh
+      lineinfile:
+        path: "/home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh"
+        regexp: ".*borg create.*"
+        state: absent
+
+    - name: Remove all borg prune commands from pocketbase_backup.sh
+      lineinfile:
+        path: "/home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh"
+        regexp: ".*borg prune.*"
+        state: absent
+
+    - name: Remove all borg compact commands from pocketbase_backup.sh
+      lineinfile:
+        path: "/home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh"
+        regexp: ".*borg compact.*"
+        state: absent
+
+    - name: Insert new borg create commands in pocketbase_backup.sh # to backup to all backup servers
+      blockinfile:
+        path: "/home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh"
+        block: |
+          {% for item in groups['backup_server'] %}
+          borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list --stats >> /home/{{ ansible_user }}/pocketbase/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          create_exit=$?
+          borg prune --glob-archives 'mc_*' --list --show-rc --keep-minutely 96 --keep-daily 28 --keep-weekly 16 --keep-monthly 12 backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/pocketbase/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          prune_exit=$?
+          borg compact backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/pocketbase/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          compact_exit=$?
+          {% endfor %}
+        marker: "# {mark}"
+        create: yes
+        insertafter: '#BORGCREATE' # This is how we know where to insert the borg commands. Needs to be present in the pocketbase_backup.sh file
+
+    - name: Set up cron job to run pocketbase_backup.sh every 15 minutes
+      ansible.builtin.cron:
+        name: "Run pocketbase_backup.sh every 15 minutes"
+        user: "{{ ansible_user }}"
+        minute: "*/15"
+        job: "/home/{{ ansible_user }}/pocketbase/pocketbase_backup.sh"

@@ -36,13 +36,13 @@
         regexp: ".*borg create.*"
         state: absent
 
-    - name: Remove all borg create commands from minecraft_backup.sh
+    - name: Remove all borg prune commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg prune.*"
         state: absent
 
-    - name: Remove all borg create commands from minecraft_backup.sh
+    - name: Remove all borg compact commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg compact.*"

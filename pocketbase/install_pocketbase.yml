@@ -1,0 +1,32 @@
+---
+- name: Deploy pocketbase Docker Compose
+  hosts: pocketbase_server
+  become: true
+  tasks:
+    - name: Set timezone to Stockholm # Change to your own timezone
+      ansible.builtin.timezone:
+        name: "Europe/Stockholm"
+
+    - name: Check if Docker is installed
+      command: docker --version
+      ignore_errors: true
+      register: docker_check
+
+    - name: Install Docker if not installed
+      include_tasks: install-docker.yml
+      when: docker_check.rc != 0
+
+    - name: Ensure pocketbase directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/pocketbase"
+        state: directory
+
+    - name: Copy docker-compose.yml to remote
+      ansible.builtin.copy:
+        src: ../compose/pocketbase.yml
+        dest: "/home/{{ ansible_user }}/pocketbase/docker-compose.yml"
+
+    - name: Run docker-compose
+      command: docker compose up -d --remove-orphans
+      args:
+        chdir: "/home/{{ ansible_user }}/pocketbase"

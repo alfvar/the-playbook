@@ -1,6 +1,6 @@
 ---
-- name: Deploy Minecraft Docker Compose
-  hosts: minecraft_server
+- name: Deploy grafana Docker Compose
+  hosts: grafana_serer
   become: true
   tasks:
     - name: Set timezone to Stockholm # Change to your own timezone
@@ -16,26 +16,17 @@
       include_tasks: install-docker.yml
       when: docker_check.rc != 0
 
-    - name: Ensure minecraft directory exists
+    - name: Ensure grafana directory exists
       ansible.builtin.file:
-        path: "/home/{{ ansible_user }}/minecraft"
+        path: "/home/{{ ansible_user }}/grafana"
         state: directory
 
     - name: Copy docker-compose.yml to remote
       ansible.builtin.copy:
-        src: ../compose/minecraft_server.yml
-        dest: "/home/{{ ansible_user }}/minecraft/docker-compose.yml"
-
-    - name: Check if rconclt is installed # Minecraft needs to execute /save-all before starting a backup
-      command: rconclt -h
-      ignore_errors: true
-      register: rcon_check
-
-    - name: Install rcon if not installed
-      include_tasks: install-rcon.yml
-      when: rcon_check.rc != 0
+        src: ../compose/grafana.yml
+        dest: "/home/{{ ansible_user }}/grafana/docker-compose.yml"
 
     - name: Run docker-compose
       command: docker compose up -d --remove-orphans
       args:
-        chdir: "/home/{{ ansible_user }}/minecraft"
+        chdir: "/home/{{ ansible_user }}/grafana"

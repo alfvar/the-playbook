@@ -1,6 +1,6 @@
 ---
 - name: Deploy grafana Docker Compose
-  hosts: grafana_serer
+  hosts: grafana_server
   become: true
   tasks:
     - name: Set timezone to Stockholm # Change to your own timezone
@@ -20,6 +20,13 @@
       ansible.builtin.file:
         path: "/home/{{ ansible_user }}/grafana"
         state: directory
+        mode: '0775'        
+
+    - name: Ensure data directory exists with r/w permissions
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/grafana/config"
+        state: directory
+        mode: '0775'
 
     - name: Copy docker-compose.yml to remote
       ansible.builtin.copy:

@@ -64,9 +64,10 @@
         create: yes
         insertafter: '#BORGCREATE' # This is how we know where to insert the borg commands. Needs to be present in the minecraft_backup.sh file
 
-    - name: Set up cron job to run minecraft_backup.sh every 15 minutes
+    - name: Set up cron job to run minecraft_backup.sh every 15 minutes, but not between 23:00 PM and 08:00 AM
       ansible.builtin.cron:
-        name: "Run minecraft_backup.sh every 15 minutes"
+        name: "Run minecraft_backup.sh every 15 minutes, but not between 23:00 PM and 08:00 AM"
         user: "{{ ansible_user }}"
         minute: "*/15"
+        hour: "8-22"
         job: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"

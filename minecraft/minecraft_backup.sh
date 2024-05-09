@@ -21,16 +21,16 @@ rconclt minecraft "save-on" # Turn saving back on
 
 #BORGCREATE
 
-if [ $create_exit -eq 0 ]; then
-    rconclt minecraft "tellraw nobody {\"text\":\"<Jesper> Kopian skickades till backupservrarna!\", \"color\":\"gray\"}"
-else
-    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte skapa backup. Ring Alfvar!\"}"
-fi
+#if [ $create_exit -eq 0 ]; then
+#    rconclt minecraft "tellraw nobody {\"text\":\"<Jesper> Kopian skickades till backupservrarna!\", \"color\":\"gray\"}"
+#else
+#    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte skapa backup. Ring Alfvar!\"}"
+#fi
+#
+#if [ $prune_exit -ne 0 ]; then
+#    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte städa undan gamla backups. Ring Alfvar!\"}"
+#fi
 
-if [ $prune_exit -ne 0 ]; then
-    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte städa undan gamla backups. Ring Alfvar!\"}"
-fi
-
-if [ $compact_exit -ne 0 ]; then
-    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte komprimera backups. Ring Alfvar!\"}"
-fi
+#if [ $compact_exit -ne 0 ]; then
+#    rconclt minecraft "tellraw @a {\"text\":\"<Jesper> Lyckades inte komprimera backups. Ring Alfvar!\"}"
+#fi

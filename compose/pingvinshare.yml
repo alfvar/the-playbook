@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  pingvin-share:
+    image: stonith404/pingvin-share
+    restart: unless-stopped
+    ports:
+      - 5555:3000
+    volumes:
+      - data:/opt/app/backend/data
+      - images:/opt/app/frontend/public/img
+
+volumes:
+  data:
+  images:

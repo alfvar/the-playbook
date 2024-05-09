@@ -1,0 +1,36 @@
+---
+- name: Deploy Sheepit Renderfarm on Nvidia machines
+  hosts: blade
+  become: yes
+  roles:
+      - role: geerlingguy.docker # Install Docker directly from the role because it's a dependency for the Nvidia Container Toolkit
+        vars:
+          docker_edition: "ce"
+          docker_packages_state: latest
+          docker_service_manage: true
+          docker_service_state: started
+          docker_service_enabled: true
+          docker_restart_handler_state: restarted
+      - role: geerlingguy.pip
+      - role: nvidia.nvidia_docker
+      - role: nvidia.nvidia_driver
+  
+  tasks:
+      - name: Set timezone to Stockholm # Change to your own timezone
+        ansible.builtin.timezone:
+          name: "Europe/Stockholm"
+
+      - name: Ensure sheepit directory exists
+        ansible.builtin.file:
+          path: "/home/{{ ansible_user }}/sheepit"
+          state: directory
+
+      - name: Copy docker-compose.yml to remote
+        ansible.builtin.copy:
+          src: ../compose/sheepit.yml
+          dest: "/home/{{ ansible_user }}/sheepit/docker-compose.yml"
+
+#      - name: Run docker-compose
+#        command: docker compose up -d --remove-orphans
+#        args:
+#          chdir: "/home/{{ ansible_user }}/sheepit"

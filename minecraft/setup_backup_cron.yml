@@ -30,19 +30,19 @@
         mode: '0755'
         
 
-    - name: Remove all borg create commands from minecraft_backup.sh
+    - name: Remove stale borg create commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg create.*"
         state: absent
 
-    - name: Remove all borg prune commands from minecraft_backup.sh
+    - name: Remove stale borg prune commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg prune.*"
         state: absent
 
-    - name: Remove all borg compact commands from minecraft_backup.sh
+    - name: Remove stale borg compact commands from minecraft_backup.sh
       lineinfile:
         path: "/home/{{ ansible_user }}/minecraft/minecraft_backup.sh"
         regexp: ".*borg compact.*"
@@ -55,7 +55,7 @@
           {% for item in groups['backup_server'] %}
           borg create backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }}::mc_${timestamp} "${mcserver_backup_dir}" --list --stats >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
           create_exit=$?
-          borg prune --glob-archives 'mc_*' --list --show-rc --keep-minutely 48 --keep-daily 14 --keep-weekly 8 --keep-monthly 12 backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
+          borg prune --glob-archives 'mc_*' --list --show-rc --keep-minutely 24 --keep-daily 14 --keep-weekly 8 --keep-monthly 12 --keep-yearly -1 backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
           prune_exit=$?
           borg compact backup@{{ hostvars[item]['ansible_host'] }}:{{ backup_volume }} >> /home/{{ ansible_user }}/minecraft/logs/${timestamp}_{{ hostvars[item]['ansible_host'] }}.log 2>&1
           compact_exit=$?

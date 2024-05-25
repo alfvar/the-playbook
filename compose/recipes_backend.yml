@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  payload:
+    image: node:18-alpine
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+      - data:/home/node/app/data
+    working_dir: /home/node/app/
+    command: sh -c "yarn install && yarn dev"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URI: postgres://postgres:example@postgres:5432/payload  # Corrected DATABASE_URI
+      PORT: 3001
+      NODE_ENV: development
+      PAYLOAD_SECRET: TESTING
+
+  postgres:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: example
+      PGDATA: /data/postgres
+    volumes:
+      - data:/data/postgres
+    ports:
+      - '5432:5432'  # Expose PostgreSQL port to the host
+
+volumes:
+  node_modules:
+  data:

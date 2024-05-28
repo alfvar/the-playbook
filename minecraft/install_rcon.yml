@@ -1,21 +1,27 @@
 ---
-- name: Rcon # Required to execute /save-all into the minecraft container before backup
-  hosts: minecraft_server
+- hosts: minecraft_server
   become: true
   tasks:
-    - name: Install rcon
-      package:
-        name: rcon
-        state: present
+    - name: Rcon # Required to execute /save-all into the minecraft container before backup
+      block:
+        - name: Ensure pip is installed
+          apt:
+            name: python3-pip
+            state: present
 
-    - name: Create rcon.conf # Replace port and passwd with your own values
-      ansible.builtin.copy:
-        dest: /etc/rcon.conf
-        content: |
-          [minecraft]
-          host = localhost
-          port = 25575
-          passwd = 4321
-        owner: root
-        group: root
-        mode: '0644'
+        - name: Install rcon
+          pip:
+            name: rcon
+            executable: pip3
+
+        - name: Create rcon.conf # Replace port and passwd with your own values
+          ansible.builtin.copy:
+            dest: /etc/rcon.conf
+            content: |
+              [minecraft]
+              host = localhost
+              port = 25575
+              passwd = 4321
+            owner: root
+            group: root
+            mode: '0644'

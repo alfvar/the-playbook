@@ -31,10 +31,11 @@
       ignore_errors: true
       register: rcon_check
 
-    - name: Install rcon if not installed
-      include_tasks: install-rcon.yml
-      when: rcon_check.rc != 0
+- import_playbook: install_rcon.yml
 
+- hosts: minecraft_server
+  become: true
+  tasks:
     - name: Run docker-compose
       command: docker compose up -d --remove-orphans
       args:

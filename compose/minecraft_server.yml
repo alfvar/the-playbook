@@ -13,7 +13,7 @@ services:
       - data:/papermc
     environment:
       - EULA=true
-      - MC_RAM=14G
+      - MC_RAM=6G
       - MC_VERSION=1.20.4
     restart: unless-stopped
     stdin_open: true

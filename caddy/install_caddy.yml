@@ -1,0 +1,48 @@
+---
+- name: Deploy caddy Docker Compose
+  hosts: grafana_server
+  become: true
+  tasks:
+    - name: Set timezone to Stockholm # Change to your own timezone
+      ansible.builtin.timezone:
+        name: "Europe/Stockholm"
+
+    - name: Check if Docker is installed
+      command: docker --version
+      ignore_errors: true
+      register: docker_check
+
+    - name: Install Docker if not installed
+      include_tasks: install-docker.yml
+      when: docker_check.rc != 0
+
+    - name: Ensure caddy directory exists
+      ansible.builtin.file:
+        path: "/home/{{ ansible_user }}/caddy"
+        state: directory
+
+    - name: Copy docker-compose.yml to remote
+      ansible.builtin.copy:
+        src: ../compose/caddy.yml
+        dest: "/home/{{ ansible_user }}/caddy/docker-compose.yml"
+
+    - name: Copy Caddyfile to remote
+      ansible.builtin.copy:
+        src: Caddyfile
+        dest: "/home/{{ ansible_user }}/caddy/Caddyfile"        
+        
+    - name: Run docker-compose and print working directory
+      command: pwd
+      args:
+        chdir: "/home/{{ ansible_user }}/caddy"
+      register: command_output
+
+    - name: Print command output
+      debug:
+        msg: "{{ command_output.stdout_lines }}"
+
+    - name: Run docker-compose and print working directory
+      command: docker compose up -d --remove-orphans
+      args:
+        chdir: "/home/{{ ansible_user }}/caddy"
+

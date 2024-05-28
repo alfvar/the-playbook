@@ -1,0 +1,11 @@
+:80 {
+  route /stats* {
+    uri strip_prefix /stats
+    reverse_proxy localhost:3000
+  }
+
+  # Forward requests for pihole.local to Pi-hole
+pihole.local {
+    reverse_proxy pihole:8088
+}
+}

@@ -21,6 +21,19 @@
         path: "/home/{{ ansible_user }}/pihole"
         state: directory
 
+    - name: Disable and stop systemd-resolved, set nameserver (Ubuntu only)
+      block:
+        - name: Disable systemd-resolved
+          ansible.builtin.systemd:
+            name: systemd-resolved
+            enabled: no
+
+        - name: Stop systemd-resolved
+          ansible.builtin.systemd:
+            name: systemd-resolved
+            state: stopped
+      when: ansible_os_family == "Debian" and ansible_distribution == "Ubuntu"
+
     - name: Copy docker-compose.yml to remote
       ansible.builtin.copy:
         src: ../compose/pihole.yml

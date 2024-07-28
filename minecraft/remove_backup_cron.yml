@@ -1,0 +1,8 @@
+- hosts: minecraft_server
+  become: true
+  tasks:
+    - name: Remove cron job that runs minecraft_backup.sh
+      ansible.builtin.cron:
+        name: "Run minecraft_backup.sh every 15 minutes, but not between 23:00 PM and 08:00 AM"
+        user: "{{ ansible_user }}"
+        state: absent

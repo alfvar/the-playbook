@@ -1,0 +1,27 @@
+- hosts: minecraft_server
+  become: true
+  vars:
+    backup_volume: "{{ hostvars[inventory_hostname]['backup_volume'] }}"
+    backup_host: "{{ hostvars[groups['backup_container'][0]]['ansible_host'] }}"
+
+  tasks:
+    - name: Ask user which backup to choose
+      ansible.builtin.pause:
+        prompt: "Please choose a backup (in the format of mc_20240420830)"
+      register: user_input
+
+    - name: Pull the chosen backup
+      ansible.builtin.command:
+        cmd: borg extract backup@{{ backup_host }}:/./minecraft_data::{{ user_input.user_input | trim }} home/{{ ansible_user }}/minecraft/backup
+
+    - name: Create a temporary container that mounts the volume
+      ansible.builtin.command:
+        cmd: docker run -d -v minecraft_data:/volume --name tempcontainer busybox tail -f /dev/null
+
+    - name: Copy the backup files into the volume
+      ansible.builtin.command:
+        cmd: docker cp ./path/to/backup/files tempcontainer:/volume
+
+    - name: Remove the temporary container
+      ansible.builtin.command:
+        cmd: docker rm tempcontainer

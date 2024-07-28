@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   minecraft:
-    image: phyremaster/papermc
+    image: phyremaster/papermc:latest
     container_name: minecraft
     ports:
       - "25565:25565"
@@ -13,8 +13,8 @@ services:
       - data:/papermc
     environment:
       - EULA=true
-      - MC_RAM=6G
-      - MC_VERSION=1.20.4
+      - MC_RAM=12G
+      - MC_VERSION=latest
     restart: unless-stopped
     stdin_open: true
     tty: true

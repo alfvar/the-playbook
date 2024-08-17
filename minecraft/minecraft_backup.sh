@@ -4,7 +4,8 @@ shorttime=$(date +%H:%M) # Define the shorttime variable
 mcserver_backup_dir=/tmp/minecraft/mc_${timestamp} # Temporary backup directory on the minecraft server machine
 # Save the Minecraft world
 rconclt minecraft "save-off"
-rconclt minecraft "save-all"
+rconclt minecraft "save-all""
+rconclt minecraft "co purge t:30d" # 
 
 rconclt minecraft "tellraw nobody {\"text\":\"<Jesper> Sparar världen klockan ${shorttime}\", \"color\":\"gray\"}"
 sleep 1

@@ -15,7 +15,7 @@ services:
       - EULA=true
       - MC_RAM=12G
       - MC_VERSION=latest
-      - TZ="Europe/Stockholm"
+      - TZ="Europe/Berlin"
     restart: unless-stopped
     stdin_open: true
     tty: true

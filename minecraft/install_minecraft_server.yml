@@ -36,7 +36,7 @@
 - hosts: minecraft_server
   become: true
   tasks:
-    - name: Run docker-compose
+    - name: Run docker-compose # Start the Minecraft server. The volume will be created if it doesn't exist. Manage your volumes with borgbackup
       command: docker compose up -d --remove-orphans
       args:
         chdir: "/home/{{ ansible_user }}/minecraft"

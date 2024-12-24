@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  blade:
+    build: .
+    container_name: test_blade
+    restart: unless-stopped
+    networks:
+      network:
+        aliases:
+          - blade
+    labels:
+      - dev.orbstack.domains=test_blade.local
+  raspberrypi:
+    build: .
+    container_name: test_raspberrypi
+    restart: unless-stopped
+    networks:
+      network:
+        aliases:
+          - raspberrypi
+    labels:
+      - dev.orbstack.domains=test_raspberrypi.local
+
+networks:
+  network:

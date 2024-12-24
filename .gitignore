@@ -1,3 +1,4 @@
 .DS_Store
 inventory.yml
 compose/sheepit.yml
+*.pub

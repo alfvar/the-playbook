@@ -1,7 +1,7 @@
 services:
 {% for host in groups['all'] %}
   {{ host }}:
-    image: ubuntu:latest
+    build: .
     container_name: {{ host }}
     restart: unless-stopped
     networks:

@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 
 RUN apt-get update && \
-    apt-get install -y sudo vim less curl wget net-tools openssh-server && \
+    apt-get install -y sudo vim less curl wget net-tools openssh-server iputils-ping && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

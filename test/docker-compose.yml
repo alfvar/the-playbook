@@ -1,6 +1,6 @@
 services:
   blade:
-    image: ubuntu:latest
+    build: .
     container_name: blade
     restart: unless-stopped
     networks:
@@ -11,7 +11,7 @@ services:
       - dev.orbstack.domains=blade.local
     command: tail -f /dev/null
   raspberrypi:
-    image: ubuntu:latest
+    build: .
     container_name: raspberrypi
     restart: unless-stopped
     networks:
@@ -22,7 +22,7 @@ services:
       - dev.orbstack.domains=raspberrypi.local
     command: tail -f /dev/null
   raspberrypi2:
-    image: ubuntu:latest
+    build: .
     container_name: raspberrypi2
     restart: unless-stopped
     networks:
@@ -33,7 +33,7 @@ services:
       - dev.orbstack.domains=raspberrypi2.local
     command: tail -f /dev/null
   nanode_1:
-    image: ubuntu:latest
+    build: .
     container_name: nanode_1
     restart: unless-stopped
     networks:

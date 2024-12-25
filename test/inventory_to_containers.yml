@@ -1,8 +1,8 @@
 ---
-- name: Deploy Docker services
+- name: Deploy Docker services 
   hosts: localhost
   tasks:
-    - name: Create new inventory file
+    - name: Create new inventory file # From inventory specified when you run the command
       template:
         src: test_inventory.yml.j2
         dest: "{{ playbook_dir }}/test_inventory.yml"

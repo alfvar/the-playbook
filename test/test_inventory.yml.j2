@@ -1,0 +1,26 @@
+myhosts:
+  hosts:
+{% for host, details in hostvars.items() if host in groups['myhosts'] %}
+    test_{{ host }}:
+      ansible_host: test_{{ details.ansible_host }}
+      ansible_user: {{ details.ansible_user }}
+{% if details.backup_volume is defined %}
+      backup_volume: "{{ details.backup_volume }}"
+{% endif %}
+{% if details.urls is defined %}
+      urls:
+{% for url in details.urls %}
+        - {{ url }}
+{% endfor %}
+  {% endif %}
+
+{% endfor %}
+
+  children:
+{% for group, group_details in groups.items() if group != 'all' and group != 'ungrouped' %}
+    {{ group }}:
+      hosts:
+{% for host in group_details %}
+        test_{{ host }}:
+{% endfor %}
+{% endfor %}

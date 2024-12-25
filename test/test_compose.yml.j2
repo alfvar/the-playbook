@@ -1,0 +1,17 @@
+services:
+{% for host in groups['all'] %}
+  {{ host }}:
+    image: ubuntu:latest
+    container_name: {{ host }}
+    restart: unless-stopped
+    networks:
+      network:
+        aliases:
+          - {{ host }}
+    labels:
+      - dev.orbstack.domains={{ host }}.local
+    command: tail -f /dev/null
+{% endfor %}
+
+networks:
+  network:

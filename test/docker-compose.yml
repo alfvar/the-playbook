@@ -1,26 +1,48 @@
-version: '3.8'
-
 services:
   blade:
-    build: .
-    container_name: test_blade
+    image: ubuntu:latest
+    container_name: blade
     restart: unless-stopped
     networks:
       network:
         aliases:
           - blade
     labels:
-      - dev.orbstack.domains=test_blade.local
+      - dev.orbstack.domains=blade.local
+    command: tail -f /dev/null
   raspberrypi:
-    build: .
-    container_name: test_raspberrypi
+    image: ubuntu:latest
+    container_name: raspberrypi
     restart: unless-stopped
     networks:
       network:
         aliases:
           - raspberrypi
     labels:
-      - dev.orbstack.domains=test_raspberrypi.local
+      - dev.orbstack.domains=raspberrypi.local
+    command: tail -f /dev/null
+  raspberrypi2:
+    image: ubuntu:latest
+    container_name: raspberrypi2
+    restart: unless-stopped
+    networks:
+      network:
+        aliases:
+          - raspberrypi2
+    labels:
+      - dev.orbstack.domains=raspberrypi2.local
+    command: tail -f /dev/null
+  nanode_1:
+    image: ubuntu:latest
+    container_name: nanode_1
+    restart: unless-stopped
+    networks:
+      network:
+        aliases:
+          - nanode_1
+    labels:
+      - dev.orbstack.domains=nanode_1.local
+    command: tail -f /dev/null
 
 networks:
   network:

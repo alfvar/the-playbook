@@ -1,48 +1,57 @@
 services:
-  blade:
+
+  test_blade:
     build: .
-    container_name: blade
+    image: blade:latest    
+    container_name: test_blade
+    hostname: test_blade
     restart: unless-stopped
+    privileged: true
     networks:
       network:
         aliases:
-          - blade
+          - test_blade
     labels:
-      - dev.orbstack.domains=blade.local
-    command: tail -f /dev/null
-  raspberrypi:
+      - dev.orbstack.domains=test_blade.local
+  test_raspberrypi:
     build: .
-    container_name: raspberrypi
+    image: raspberrypi:latest    
+    container_name: test_raspberrypi
+    hostname: test_raspberrypi
     restart: unless-stopped
+    privileged: true
     networks:
       network:
         aliases:
-          - raspberrypi
+          - test_raspberrypi
     labels:
-      - dev.orbstack.domains=raspberrypi.local
-    command: tail -f /dev/null
-  raspberrypi2:
+      - dev.orbstack.domains=test_raspberrypi.local
+  test_raspberrypi2:
     build: .
-    container_name: raspberrypi2
+    image: raspberrypi2:latest    
+    container_name: test_raspberrypi2
+    hostname: test_raspberrypi2
     restart: unless-stopped
+    privileged: true
     networks:
       network:
         aliases:
-          - raspberrypi2
+          - test_raspberrypi2
     labels:
-      - dev.orbstack.domains=raspberrypi2.local
-    command: tail -f /dev/null
-  nanode_1:
+      - dev.orbstack.domains=test_raspberrypi2.local
+  test_nanode_1:
     build: .
-    container_name: nanode_1
+    image: nanode_1:latest    
+    container_name: test_nanode_1
+    hostname: test_nanode_1
     restart: unless-stopped
+    privileged: true
     networks:
       network:
         aliases:
-          - nanode_1
+          - test_nanode_1
     labels:
-      - dev.orbstack.domains=nanode_1.local
-    command: tail -f /dev/null
+      - dev.orbstack.domains=test_nanode_1.local
 
 networks:
   network:

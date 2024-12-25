@@ -1,7 +1,7 @@
 myhosts:
   hosts:
     test_blade:
-      ansible_host: test_blade
+      ansible_host: test_blade.local
       ansible_user: alfvar
       backup_volume: "minecraft_data"
       urls:
@@ -9,27 +9,21 @@ myhosts:
         - stats.alfvar.com:grafana
   
     test_raspberrypi:
-      ansible_host: test_east.alfvar.com
+      ansible_host: test_raspberrypi.local
       ansible_user: alfvar
 
     test_raspberrypi2:
-      ansible_host: test_raspberrypi2
+      ansible_host: test_raspberrypi2.local
       ansible_user: alfvar
       backup_volume: "minecraft_data"
 
     test_nanode_1:
-      ansible_host: test_172.234.107.13
+      ansible_host: test_nanode_1.local
       ansible_user: alfvar
       backup_volume: "pocketbase_data"
 
 
   children:
-    myhosts:
-      hosts:
-        test_blade:
-        test_raspberrypi:
-        test_raspberrypi2:
-        test_nanode_1:
     backup_server:
       hosts:
         test_blade:

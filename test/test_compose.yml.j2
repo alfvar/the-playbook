@@ -1,16 +1,19 @@
 services:
+
 {% for host in groups['all'] %}
-  {{ host }}:
+  test_{{ host }}:
     build: .
-    container_name: {{ host }}
+    image: {{ host }}:latest    
+    container_name: test_{{ host }}
+    hostname: test_{{ host }}
     restart: unless-stopped
+    privileged: true
     networks:
       network:
         aliases:
-          - {{ host }}
+          - test_{{ host }}
     labels:
-      - dev.orbstack.domains={{ host }}.local
-    command: tail -f /dev/null
+      - dev.orbstack.domains=test_{{ host }}.local
 {% endfor %}
 
 networks:

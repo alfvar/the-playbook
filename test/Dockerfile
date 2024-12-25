@@ -19,6 +19,9 @@ RUN chown -R alfvar:alfvar /home/alfvar/.ssh && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
     sed -i 's/Port 22/Port 22/' /etc/ssh/sshd_config
 
+# Generate SSH host keys
+RUN ssh-keygen -A
+
 EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]

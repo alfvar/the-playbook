@@ -1,4 +1,6 @@
 # The Playbook
+Deprecated! I've move on to using Kubernetes for my homelab, see the repo "fruktsallad". Keeping this for reference.
+
 Manages my `docker-compose.yml` files and gives me backups for the Docker volumes that are important. The labels that are given to the backup repositories are defined in `inventory.yml` under `backup_volume`. The amount of backup servers can be scaled, and the backup repositories are stored per service rather than per user, to make it easier to delegate a task to a new machine and bring its data along with it. Like Kubernetes for snails.
 
 ## How to
